@@ -1,0 +1,21 @@
+
+     <!-- Region and Market Selection -->
+     <h3>Region</h3>
+    <div class="custom-dropdown">
+        <button type="button" onclick="toggleCustomDropdown('customDropdown1')">Select Option 1</button>
+        <div class="custom-dropdown-content" id="customDropdown1">
+            {% for region in regions %}
+                <label>
+                    <input type="checkbox" value="{{ region }}">{{ region }}
+                </label>
+            {% endfor %}
+        </div>
+    </div>
+    <button type="button" onclick="populateSecondDropdown()">Fetch Data</button>
+    <h3>Market</h3>
+    <div class="custom-dropdown">
+        <button type="button" onclick="toggleCustomDropdown('customDropdown2')">Select Option 2</button>
+        <div class="custom-dropdown-content" id="customDropdown2">
+            <!-- Options will be populated dynamically -->
+        </div>
+    </div>

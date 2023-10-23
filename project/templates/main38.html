@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Volume Distribution</title>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.14.0/css/bootstrap-select.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.14.0/js/bootstrap-select.min.js"></script>
+
+
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <style>
+        /* Global Styles */
+        body {
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(120deg, #84fab0 0%, #8fd3f4 100%);
+            color: #333;
+        }
+
+        h1, h2, h3, h4, h5 {
+            margin: 0;
+            font-weight: 600;
+        }
+
+        /* Form Container */
+        form {
+            max-width: 900px;
+            margin: 50px auto;
+            padding: 40px;
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        form:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        /* Headings */
+        h3 {
+            font-size: 1.5em;
+            border-bottom: 3px solid #007BFF;
+            padding-bottom: 10px;
+            margin-bottom: 25px;
+            margin-top: 0;
+        }
+
+        /* Form Elements */
+        label, input, select, button {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 1em;
+            transition: border-color 0.2s;
+        }
+
+        input:focus, select:focus {
+            border-color: #007BFF;
+            outline: none;
+            box-shadow: 0 2px 8px rgba(0, 123, 255, 0.1);
+        }
+
+        button {
+            background-color: #007BFF;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        .contribution-box {
+            background-color: #f2f2f2;
+        }
+
+        /* Dynamic Fields */
+        .dynamic-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .dynamic-row select, .dynamic-row input {
+            flex: 1;
+        }
+
+        @media (max-width: 768px) {
+            .dynamic-row select, .dynamic-row input {
+                width: 100%;
+            }
+        }
+
+        /* Months Selection */
+        .months-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .month-checkbox {
+            display: flex;
+            align-items: center;
+            margin-right: 20px;
+        }
+
+        .month-checkbox label {
+            margin: 0;
+            margin-left: 5px;
+        }
+
+        /* Results */
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+
+        th, td {
+            text-align: left;
+            padding: 15px;
+        }
+
+        th {
+            background-color: #007BFF;
+            color: white;
+        }
+
+        tr:hover {
+            background-color: #f5f5f5;
+        }
+
+        /* Days Calculation */
+        .days-calculation {
+            background-color: #007BFF;
+            color: #fff;
+            padding: 15px;
+            border-radius: 6px;
+            text-align: center;
+            max-width: 400px;
+            margin: 20px auto;
+        }
+
+        /* Enhanced Labels */
+        label[for="volume"], label[for="region"], label[for="market"] {
+            display: block;
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #0056b3;
+            background: linear-gradient(120deg, #e6f7ff, #ffffff);
+            border: 2px solid #007BFF;
+            border-radius: 8px;
+            padding: 10px 15px;
+            margin-bottom: 10px;
+        }
+
+        /* Adjust corresponding input/select styles for better alignment */
+        input#volume, select#region, select#market {
+            margin-top: 10px;
+        }
+
+        /* Summary Table Styles */
+        .summary-table {
+            border-collapse: collapse;
+            width: 80%;
+            margin: 30px auto;
+        }
+
+        .summary-table, .summary-table th, .summary-table td {
+            border: 1px solid #007BFF;
+        }
+
+        .summary-table th, .summary-table td {
+            padding: 15px;
+            text-align: center;
+        }
+
+        .summary-table th {
+            background-color: #007BFF;
+            color: white;
+        }
+
+        .summary-table tr:hover {
+            background-color: #f5f5f5;
+        }
+
+        /* Enhanced Days Display Styles */
+        .days-display {
+            background-color: #fff;
+            border: 2px solid #007BFF;
+            border-radius: 8px;
+            padding: 15px 20px;
+            margin: 20px 0;
+            box-shadow: 0 4px 12px rgba(0, 123, 255, 0.15);
+            text-align: center;
+            font-size: 1.4em;
+            font-weight: bold;
+            color: #007BFF;
+        }
+
+        .days-display p {
+            margin: 5px 0;
+        }
+
+        /* Title Styles */
+        .page-title {
+            text-align: center;
+            font-size: 2.5em;
+            font-weight: bold;
+            color: #007BFF;
+            padding: 20px 0;
+            margin-bottom: 30px;
+            background-color: #f2f2f2;
+            border-bottom: 5px solid #0056b3;
+        }
+
+
+/* jsfjdjfjsdfsfdd */
+
+
+.checkbox-dropdown {
+    width: 100x;
+    border: 1px solid #aaa;
+    padding: 10px;
+    position: relative;
+    margin: 0 auto;
+
+    user-select: none;
+}
+
+/* Display CSS arrow to the right of the dropdown text */
+.checkbox-dropdown:after {
+    content:'';
+    height: 0;
+    position: absolute;
+    width: 0;
+    border: 6px solid transparent;
+    border-top-color: #000;
+    top: 50%;
+    right: 10px;
+    margin-top: -3px;
+}
+
+/* Reverse the CSS arrow when the dropdown is active */
+.checkbox-dropdown.is-active:after {
+    border-bottom-color: #000;
+    border-top-color: #fff;
+    margin-top: -9px;
+
+}
+
+
+.checkbox-dropdown-list-1 {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    position: absolute;
+    top: 100%; /* align the dropdown right below the dropdown text */
+    border: inherit;
+    border-top: none;
+    left: -1px; /* align the dropdown to the left */
+    right: -1px; /* align the dropdown to the right */
+    opacity: 0; /* hide the dropdown */
+
+    transition: opacity 0.4s ease-in-out;
+    height: 150px;
+    overflow: scroll;
+    overflow-x: hidden;
+    pointer-events: none; /* avoid mouse click events inside the dropdown */
+    background-color: white;
+}
+
+.checkbox-dropdown-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    position: absolute;
+    top: 100%; /* align the dropdown right below the dropdown text */
+    border: inherit;
+    border-top: none;
+    left: -1px; /* align the dropdown to the left */
+    right: -1px; /* align the dropdown to the right */
+    opacity: 0; /* hide the dropdown */
+
+    transition: opacity 0.4s ease-in-out;
+    height: 150px;
+    overflow: scroll;
+    overflow-x: hidden;
+    pointer-events: none; /* avoid mouse click events inside the dropdown */
+    background-color: white;
+}
+.is-active .checkbox-dropdown-list-1 {
+    opacity: 1; /* display the dropdown */
+    pointer-events: auto; /* make sure that the user still can select checkboxes */
+}
+
+.is-active .checkbox-dropdown-list {
+    opacity: 1; /* display the dropdown */
+    pointer-events: auto; /* make sure that the user still can select checkboxes */
+}
+
+
+.checkbox-dropdown-list-1 li label {
+    display: block;
+    border-bottom: 1px solid silver;
+    padding: 10px;
+
+    transition: all 0.2s ease-out;
+}
+
+.checkbox-dropdown-list-1 li label:hover {
+    background-color: silver;
+    color: white;
+}
+
+
+
+.checkbox-dropdown-list li label {
+    display: block;
+    border-bottom: 1px solid silver;
+    padding: 10px;
+
+    transition: all 0.2s ease-out;
+}
+
+.checkbox-dropdown-list li label:hover {
+    background-color: silver;
+    color: white;
+}
+
+
+
+   /* Add your custom dropdown styling here */
+   .custom-dropdown-content {
+    display: none;
+    /* position: absolute; */
+    background-color: #f9f9f9;
+    /* min-width: 160px; */
+    box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+    z-index: 1;
+    max-height: 50vh; /* Set to a percentage of the viewport height */
+    overflow-y: auto;
+}
+
+.custom-dropdown-content label {
+    display: block;
+    padding: 10px;
+}
+   
+    </style>
+
+
+</head>
+
+<body>
+
+<div class="page-title">
+    Crew Simulator
+</div>
+
+
+<form method="post">
+    <!-- Volume Input -->
+    <div>
+        <label for="volume">Enter Total Volume:</label>
+        <input type="number" id="volume" name="volume" required>
+    </div>
+    <hr>
+
+     <!-- Region and Market Selection -->
+     <h3>Region</h3>
+    <div class="custom-dropdown">
+        <button type="button" onclick="toggleCustomDropdown1('customDropdown1')">Click Select Region</button>
+        <div class="custom-dropdown-content" id="customDropdown1">
+            {% for region in regions %}
+                <label>
+                    <input name="region[]" type="checkbox" value="{{ region }}">{{ region }}
+                </label>
+            {% endfor %}
+        </div>
+    </div>
+    <h3>Market</h3>
+    <div class="custom-dropdown">
+        <button type="button" onclick="toggleCustomDropdown2('customDropdown2')">Click Select Market</button>
+        <div class="custom-dropdown-content" id="customDropdown2">
+            <!-- Options will be populated dynamically -->
+        </div>
+    </div>
+    
+
+
+    <h3>Period - Month</h3>
+    <div class="months-container">
+        {% for month in months %}
+        <div class="month-checkbox">
+            <input type="checkbox" id="{{ month }}" name="months" value="{{ month }}">
+            <label for="{{ month }}">{{ month }}</label>
+        </div>
+        {% endfor %}
+    </div>
+    <hr>
+
+    <!-- Dynamic Fields for SMP, SDRM, SDRM-Project Type, Percentage, and 1 Crew Capability-Actual -->
+
+        <div id="dynamic-fields-container">
+            <div class="dynamic-row">
+                <select name="smp">
+                    {% for smp in smps %}
+                    <option value="{{ smp }}">{{ smp }}</option>
+                    {% endfor %}
+                </select>
+
+                <select name="sdrm">
+                    {% for sdrm in sdrms %}
+                    <option value="{{ sdrm }}">{{ sdrm }}</option>
+                    {% endfor %}
+                </select>
+
+                <select name="sdrm_project_type">
+                    {% for sdrm_project_type in sdrm_project_types %}
+                    <option value="{{ sdrm_project_type }}">{{ sdrm_project_type }}</option>
+                    {% endfor %}
+                </select>
+
+                <input type="number" class="percentage-input" name="percentage" min="0" step="0.1" placeholder="Enter volume" required>
+                <input type="text" class="contribution-box" readonly placeholder="Contribution %">
+
+            </div>
+    </div>
+    <button type="button" onclick="addRow()">Add Row</button>
+
+    <!-- Submit Button -->
+    <div>
+        <input type="submit" value="Submit">
+    </div>
+</form>
+
+<!-- Days Calculation -->
+{% if total_days and total_weekends %}
+<hr>
+<h3 style="text-align: center;">Days Calculation:</h3>
+<div class="days-display">
+    <p>Total Working Days (Excluding Weekends): {{ total_days }} days</p>
+    <p>Total Days: {{ total_days + total_weekends }} days</p>
+</div>
+{% endif %}
+
+<!-- Display Results -->
+{% if actual_crew_required %}
+<hr>
+<h3 style="text-align: center;">Results:</h3>
+<table border="1" cellspacing="0" cellpadding="10" style="width: 100%; margin-bottom: 20px;">
+<thead>
+    <tr>
+        <th>Type</th>
+        <th>Sites</th>
+        <th>SLA</th>
+        <th>Cycle Time - Actual</th>
+        <th>Crews needed - Ideal</th>
+        <th>Crews needed - Actual</th>
+    </tr>
+</thead>
+<tbody>
+    {% for key, cycle_time in cycle_times.items() %}
+    <tr>
+        <td>{{ key }}</td>
+        <td>{{ entered_sites_values[loop.index0] }}</td>
+        <td>{{ average_slas[key] }}</td>
+        <td>{{ cycle_times[key] }}</td>
+        <td>{{ crews_needed_ideal[key] }}</td>
+        <td>{{ crews_needed_actual[key] }}</td>
+    </tr>
+    {% endfor %}
+</tbody>
+</table>
+
+
+<table class="summary-table">
+    <thead>
+        <tr>
+            <th></th>
+            <th>Ideal</th>
+            <th>Actual</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td><strong>Total Crews needed</strong></td>
+            <td>{{ sum_crews_needed_ideal }} crews</td>
+            <td>{{ sum_crews_needed_actual }} crews</td>
+        </tr>
+        <tr>
+            <td><strong>Workload</strong></td>
+            <td>{{ sum_crews_needed_ideal * total_days }} (Crews x Working Days)</td>
+            <td>{{ sum_crews_needed_actual * total_days }} (Crews x Working Days)</td>
+        </tr>
+    </tbody>
+</table>
+
+
+{% endif %}
+
+
+
+<script>
+    const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+    const currentYear = new Date().getFullYear();
+
+    function count_days(year, month) {
+        let date = new Date(year, month, 0);
+        let weekdays = 0;
+        let weekends = 0;
+
+        for(let i = 1; i <= date.getDate(); i++) {
+            let day = new Date(year, month - 1, i).getDay();
+            if(day === 0 || day === 6) {
+                weekends++;
+            } else {
+                weekdays++;
+            }
+        }
+        return [weekdays, weekends];
+    }
+
+    function updateDaysBasedOnMonths() {
+        let totalDays = 0;
+        let totalWeekends = 0;
+
+        $("input[name='months']:checked").each(function() {
+            let monthName = $(this).val();
+            let monthNum = months.indexOf(monthName) + 1;
+            let weekdays, weekends;
+            [weekdays, weekends] = count_days(currentYear, monthNum);
+            totalDays += weekdays;
+            totalWeekends += weekends;
+        });
+
+        let totalCombinedDays = totalDays + totalWeekends; // Calculate total combined days
+
+        $("#dynamicTotalDays").text(`Total Working Days (Excluding Weekends): ${totalDays} days`);
+        $("#dynamicTotalWeekends").text(`Total Days (Including Weekends): ${totalCombinedDays} days`); // Update the label
+
+        $(".percentage-input").trigger("change");
+    }
+
+    function calculatePercentageContribution(inputElement) {
+        let totalVolume = parseFloat($("#volume").val());
+        let enteredVolume = parseFloat($(inputElement).val());
+        let contributionPercent = (enteredVolume / totalVolume) * 100;
+
+        $(inputElement).closest(".dynamic-row").find('.contribution-box').val(contributionPercent.toFixed(2) + "%");
+
+        let totalDaysText = $("#dynamicTotalDays").text();
+        let totalDays = parseInt(totalDaysText.match(/\d+/)[0]);
+
+        let smp = $(inputElement).closest(".dynamic-row").find("select[name='smp']").val();
+        let sdrm = $(inputElement).closest(".dynamic-row").find("select[name='sdrm']").val();
+        let sdrm_project_type = $(inputElement).closest(".dynamic-row").find("select[name='sdrm_project_type']").val();
+
+        $.getJSON('/get_cycle_time', { smp: smp, sdrm: sdrm, sdrm_project_type: sdrm_project_type }, function(data) {
+            if(data.cycle_time) {
+                let crewCapabilityActual = Math.round(totalDays / data.cycle_time);
+                $(inputElement).closest(".dynamic-row").find('.crew-capability-box').val(crewCapabilityActual);
+            } else {
+                $(inputElement).closest(".dynamic-row").find('.crew-capability-box').val('Not available');
+            }
+        });
+    }
+
+    function updateSDRMs(selectElement) {
+        let selectedSMP = $(selectElement).val();
+        $.getJSON('/get_sdrms', { smp: selectedSMP }, function(data) {
+            let options = '<option value="">Select SDRM</option>';
+            for(let sdrm of data) {
+                options += `<option value="${sdrm}">${sdrm}</option>`;
+            }
+            $(selectElement).closest(".dynamic-row").find("select[name='sdrm']").html(options);
+        });
+    }
+
+    function updateSDRMProjectTypes(selectElement) {
+        let selectedSDRM = $(selectElement).val();
+        $.getJSON('/get_sdrm_project_types', { sdrm: selectedSDRM }, function(data) {
+            let options = '<option value="">Select SDRM-Project Type</option>';
+            for(let sdrm_project_type of data) {
+                options += `<option value="${sdrm_project_type}">${sdrm_project_type}</option>`;
+            }
+            $(selectElement).closest(".dynamic-row").find("select[name='sdrm_project_type']").html(options);
+        });
+    }
+
+    // Delegate event listener for SMP dropdown change to the container
+    $('#dynamic-fields-container').on("change", "select[name='smp']", function() {
+        updateSDRMs(this);
+    });
+
+    // Delegate event listener for SDRM dropdown change to the container
+    $('#dynamic-fields-container').on("change", "select[name='sdrm']", function() {
+        updateSDRMProjectTypes(this);
+    });
+
+
+    function addRow() {
+    let container = $('#dynamic-fields-container');
+    let newRow = container.find('.dynamic-row:first').clone();
+    newRow.find('input').val('');
+    newRow.find("select").val('');
+    container.append(newRow);
+
+    // Attach event listeners to the new row
+    newRow.find(".percentage-input").on("input", function() {
+        calculatePercentageContribution(this);
+    });
+    newRow.find("select[name='smp'], select[name='sdrm'], select[name='sdrm_project_type']").on("change", function() {
+        calculatePercentageContribution(this);
+    });
+
+    // Trigger a change event on the 'SMP' dropdown to refresh the related dropdown lists
+    newRow.find("select[name='smp']").trigger('change');
+}
+
+    function attachListeners() {
+        $(".percentage-input, select[name='smp'], select[name='sdrm'], select[name='sdrm_project_type']").on("change", function() {
+            calculatePercentageContribution(this);
+        });
+    }
+
+    $(document).ready(function() {
+        attachListeners();
+        $("input[name='months']").on("change", updateDaysBasedOnMonths);
+        $(".percentage-input").on("input", function() {
+            calculatePercentageContribution(this);
+        });
+    });
+
+    function toggleCustomDropdown2(id) {
+        var dropdownContent = document.getElementById(id);
+        dropdownContent.style.display = (dropdownContent.style.display === "block") ? "none" : "block";
+    }
+
+    function toggleCustomDropdown1(id) {
+    var dropdownContent = document.getElementById(id);
+    if (dropdownContent.style.display === "block") {
+        // If the dropdown is currently visible, hide it and call populateSecondDropdown
+        dropdownContent.style.display = "none";
+        populateSecondDropdown();
+    } else {
+        // If the dropdown is currently hidden, show it
+        dropdownContent.style.display = "block";
+    }
+}
+
+
+    function populateSecondDropdown() {
+        var selectedOptions = Array.from(document.querySelectorAll("#customDropdown1 input:checked")).map(input => input.value);
+
+        fetch('/get_second_dropdown_data', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ selectedOptions: selectedOptions }),
+        })
+        .then(response => response.json())
+        .then(data => {
+            var secondDropdown = document.getElementById("customDropdown2");
+            secondDropdown.innerHTML = '';
+
+            // Assuming data is now an array of options
+            data.forEach(option => {
+                var label = document.createElement("label");
+                var checkbox = document.createElement("input");
+                checkbox.type = "checkbox";
+                checkbox.name = "market[]";
+                checkbox.value = option;
+                label.appendChild(checkbox);
+                label.appendChild(document.createTextNode(option));
+                secondDropdown.appendChild(label);
+            });
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
+    }
+
+</script>
+
+
+</body>
+</html>
